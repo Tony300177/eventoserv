@@ -1,12 +1,15 @@
 import { integer, pgEnum, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
+export const userRoleEnum = pgEnum("role", ["user", "admin"]);
+export const registrationStatusEnum = pgEnum("status", ["active", "cancelled"]);
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: pgEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: userRoleEnum("role").default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -28,7 +31,7 @@ export const registrations = pgTable("registrations", {
   hasCompanion: integer("hasCompanion").notNull().default(0),
   companionName: varchar("companionName", { length: 180 }),
   peopleCount: integer("peopleCount").notNull().default(1),
-  status: pgEnum("status", ["active", "cancelled"]).notNull().default("active"),
+  status: registrationStatusEnum("status").default("active").notNull(),
   rulesVersion: varchar("rulesVersion", { length: 32 }).notNull().default("1.0"),
   rulesAcceptedAt: timestamp("rulesAcceptedAt").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

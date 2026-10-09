@@ -1,13 +1,13 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import { eq } from "drizzle-orm";
 import { getDb } from "./db";
 import { users } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google],
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account }: { user: any; account: any }) {
       if (!user.email) return false;
       const db = await getDb();
       if (!db) return true;
@@ -26,7 +26,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return true;
     },
-    async session({ session }) {
+    async session({ session }: { session: any }) {
       if (session.user?.email) {
         const db = await getDb();
         if (db) {

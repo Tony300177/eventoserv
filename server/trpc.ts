@@ -9,6 +9,5 @@ export function handler(request: Request) {
     req: request,
     router: appRouter,
     createContext,
-    transformer: superjson,
   });
 }
