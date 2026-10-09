@@ -163,6 +163,9 @@ td small { color: #9aa2a3; font-size: 10px; }
 .admin-state p { max-width: 340px; color: var(--muted); margin: 0 0 10px; font-size: 13px; line-height: 1.5; }
 .state-icon { display: grid; place-items: center; width: 58px; height: 58px; background: #fbe4dc; color: var(--danger); border-radius: 50%; margin-bottom: 4px; }
 .admin-state .back-link { margin-top: 11px; }
+.admin-login { width: min(100%, 340px); display: grid; gap: 4px; text-align: left; }
+.admin-login .field-group { margin-bottom: 14px; }
+.admin-login .button { width: 100%; }
 .spinner { width: 23px; height: 23px; border: 3px solid #dfe4e1; border-top-color: var(--petrol); border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .modal-backdrop { position: fixed; inset: 0; background: rgba(5, 30, 36, .52); display: grid; place-items: center; padding: 20px; z-index: 10; }

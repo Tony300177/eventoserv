@@ -56,7 +56,6 @@ export const appRouter = router({
   }),
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
-    logout: publicProcedure.mutation(() => ({ success: true } as const)),
   }),
   registration: router({
     publicStats: publicProcedure.query(() => getPublicStats()),

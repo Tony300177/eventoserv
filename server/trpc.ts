@@ -1,5 +1,4 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import superjson from "superjson";
 import { appRouter } from "./routers.js";
 import { createContext } from "./context.js";
 
@@ -8,6 +7,6 @@ export function handler(request: Request) {
     endpoint: "/api/trpc",
     req: request,
     router: appRouter,
-    createContext,
+    createContext: () => createContext(request),
   });
 }

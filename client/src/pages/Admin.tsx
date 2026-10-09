@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { ArrowLeft, BarChart3, Check, Download, LogOut, Pencil, Search, ShieldAlert, UserRound, UsersRound, X } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { ArrowLeft, BarChart3, Check, CircleAlert, Download, LogOut, Pencil, Search, ShieldAlert, UserRound, UsersRound, X } from "lucide-react";
+import { useSession, useLogin, useLogout } from "@/lib/session";
 import { trpc } from "@/lib/trpc";
 
 const SCHOOLS = [
@@ -16,7 +16,10 @@ type Row = {
 type AdminForm = { schoolSector: SchoolSector; role: string; employeeName: string; hasCompanion: boolean; companionName: string };
 
 export default function Admin() {
-  const { data: session, status } = useSession();
+  const { data: session, isLoading } = useSession();
+  const login = useLogin();
+  const { logout } = useLogout();
+  const [password, setPassword] = useState("");
   const [search, setSearch] = useState("");
   const [schoolSector, setSchoolSector] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "cancelled">("active");
@@ -25,8 +28,8 @@ export default function Admin() {
   const [cancelTarget, setCancelTarget] = useState<Row | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const utils = trpc.useUtils();
-  const isAdmin = session?.user?.role === "admin";
-  const enabled = Boolean(session && isAdmin);
+  const isAdmin = session?.role === "admin";
+  const enabled = isAdmin;
   const stats = trpc.registration.adminStats.useQuery(undefined, { enabled });
   const rows = trpc.registration.adminList.useQuery({ search, schoolSector, status: statusFilter, hasCompanion: companion }, { enabled });
   const update = trpc.registration.update.useMutation({ onSuccess: () => { setEditing(null); utils.registration.adminList.invalidate(); utils.registration.adminStats.invalidate(); } });
@@ -43,9 +46,41 @@ export default function Admin() {
     anchor.href = url; anchor.download = "inscricoes-evento.csv"; anchor.click(); URL.revokeObjectURL(url);
   }
 
-  if (status === "loading") return <div className="admin-state"><div className="spinner" />Carregando sessão...</div>;
-  if (!session) return <div className="admin-state"><div className="state-icon"><ShieldAlert /></div><h1>Área administrativa</h1><p>Entre com sua conta para acessar os dados de inscrição.</p><button className="button button-primary" onClick={() => signIn("google")}>Entrar com Google</button><a className="back-link" href="/"><ArrowLeft size={16} /> Voltar para inscrição</a></div>;
-  if (!isAdmin) return <div className="admin-state"><div className="state-icon"><ShieldAlert /></div><h1>Acesso restrito</h1><p>Esta conta está autenticada, mas não possui permissão de administração.</p><a className="back-link" href="/"><ArrowLeft size={16} /> Voltar para inscrição</a></div>;
+  if (isLoading) return <div className="admin-state"><div className="spinner" />Carregando sessão...</div>;
+
+  if (!isAdmin) {
+    return (
+      <div className="admin-state">
+        <div className="state-icon"><ShieldAlert /></div>
+        <h1>Área administrativa</h1>
+        <p>Informe a senha de administração para acessar os dados de inscrição.</p>
+        <form
+          className="admin-login"
+          onSubmit={event => {
+            event.preventDefault();
+            login.mutate(password, { onSuccess: () => setPassword("") });
+          }}
+        >
+          <label className="field-group">
+            <span>Senha</span>
+            <input
+              type="password"
+              value={password}
+              onChange={event => setPassword(event.target.value)}
+              placeholder="Senha do administrador"
+              autoComplete="current-password"
+              autoFocus
+            />
+          </label>
+          {login.error && <div className="form-error" role="alert"><CircleAlert size={16} />{login.error.message}</div>}
+          <button className="button button-primary" type="submit" disabled={login.isPending || !password}>
+            {login.isPending ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+        <a className="back-link" href="/"><ArrowLeft size={16} /> Voltar para inscrição</a>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-shell">
@@ -53,7 +88,7 @@ export default function Admin() {
         <div className="brand"><span className="brand-mark"><i /><i /></span><span>encontro</span></div>
         <div className="sidebar-caption">Gestão do evento</div>
         <nav><a className="active" href="#visao-geral"><BarChart3 size={17} /> Visão geral</a><a href="#inscricoes"><UsersRound size={17} /> Inscrições</a></nav>
-        <div className="sidebar-bottom"><div className="admin-identity"><span className="avatar"><UserRound size={15} /></span><div><strong>{session.user?.name || "Administrador"}</strong><small>Administrador</small></div></div><button className="logout-button" onClick={() => signOut()}><LogOut size={16} /> Sair</button></div>
+        <div className="sidebar-bottom"><div className="admin-identity"><span className="avatar"><UserRound size={15} /></span><div><strong>{session?.name || "Administrador"}</strong><small>Administrador</small></div></div><button className="logout-button" onClick={() => logout()}><LogOut size={16} /> Sair</button></div>
       </aside>
       <main className="admin-main">
         <header className="admin-header"><div><p className="eyebrow">Painel de controle</p><h1>Visão geral</h1></div><a className="back-link" href="/"><ArrowLeft size={16} /> Página de inscrição</a></header>

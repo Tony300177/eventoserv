@@ -1,23 +1,20 @@
-import type { Session } from "next-auth";
-import { auth } from "./auth.js";
-import { getUserByOpenId } from "./db.js";
 import type { User } from "../drizzle/schema.js";
+import { eq } from "drizzle-orm";
+import { getDb } from "./db.js";
+import { users } from "../drizzle/schema.js";
+import { SESSION_COOKIE, readCookie, verifySessionToken } from "./session.js";
 
 export type TrpcContext = {
   user: User | null;
 };
 
-export async function createContext(): Promise<TrpcContext> {
-  let session: Session | null = null;
-  try {
-    session = await auth();
-  } catch (error) {
-    console.warn("[Auth] Session unavailable:", error instanceof Error ? error.message : error);
-  }
+export async function createContext(request: Request): Promise<TrpcContext> {
+  const session = verifySessionToken(readCookie(request.headers.get("cookie"), SESSION_COOKIE));
+  if (!session) return { user: null };
 
-  const email = session?.user?.email;
-  if (!email) return { user: null };
+  const db = await getDb();
+  if (!db) return { user: null };
 
-  const user = await getUserByOpenId(email);
-  return { user: user ?? null };
+  const rows = await db.select().from(users).where(eq(users.openId, session.email)).limit(1);
+  return { user: rows[0] ?? null };
 }
