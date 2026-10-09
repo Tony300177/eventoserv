@@ -1,4 +1,7 @@
 import { handler } from "../../server/trpc.js";
+import { nodeHandler } from "../../server/node-adapter.js";
 
-export const GET = handler;
-export const POST = handler;
+const handle = nodeHandler(handler);
+
+export const GET = handle;
+export const POST = handle;
