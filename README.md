@@ -1,14 +1,33 @@
 # Inscrição Evento dos Servidores
 
-React / Express / tRPC / Drizzle starter, adapted from the Sandbox web-db-user template.
+React + Vite + tRPC + NextAuth + MySQL (Drizzle ORM)
 
-- `pnpm dev`: development server; honors `PORT` (default 3000).
-- `pnpm build` / `pnpm start`: build and serve `dist/index.js` and `dist/public/`.
-- `pnpm db:migrate`: apply checked-in migrations. `pnpm db:push`: generate and apply new schema changes.
-- `pnpm check` / `pnpm test`: types and application tests.
+## Desenvolvimento
 
-Start with the Webdev skill's default-template guide. Platform login, storage, payments and service contracts live in its shared references; read the relevant capability before extending its helper.
+```bash
+pnpm install
+pnpm dev
+```
 
-`server/_core/publicConfig.ts` exposes only named public runtime values. Private keys stay server-side. The platform serves managed `/manus-storage/` assets; the application does not register a second proxy.
+## Build e Deploy (Vercel)
 
-Platform configuration is readable and editable through `webdev.config`. Default settings are initial values, not enforced constraints. The agent may modify the files, commands and configuration or follow the flexible guide for another stack.
+```bash
+pnpm build
+```
+
+## Banco de Dados
+
+```bash
+pnpm db:migrate    # Aplicar migrações
+pnpm db:push       # Gerar e aplicar novas migrações
+```
+
+## Variáveis de Ambiente
+
+```env
+DATABASE_URL=mysql://user:pass@host:3306/dbname
+NEXTAUTH_SECRET=random-string
+NEXTAUTH_URL=https://your-app.vercel.app
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+```
