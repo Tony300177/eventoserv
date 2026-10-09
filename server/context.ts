@@ -1,3 +1,4 @@
+import type { Session } from "next-auth";
 import { auth } from "./auth.js";
 import { getUserByOpenId } from "./db.js";
 import type { User } from "../drizzle/schema.js";
@@ -7,7 +8,7 @@ export type TrpcContext = {
 };
 
 export async function createContext(): Promise<TrpcContext> {
-  let session: Awaited<ReturnType<typeof auth>> = null;
+  let session: Session | null = null;
   try {
     session = await auth();
   } catch (error) {
