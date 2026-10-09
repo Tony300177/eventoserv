@@ -10,7 +10,7 @@ export const RULES_VERSION = "1.0";
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      const client = postgres(process.env.DATABASE_URL, { family: 6, ssl: "require" });
+      const client = postgres(process.env.DATABASE_URL, { ssl: "require" });
       _db = drizzle(client);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
