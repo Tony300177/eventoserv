@@ -1,15 +1,13 @@
-import { DefaultSession } from "next-auth";
+export {};
 
 declare module "next-auth" {
   interface Session {
     user: {
-      id: number;
-      role: "user" | "admin";
-    } & DefaultSession["user"];
-  }
-
-  interface User {
-    id: number;
-    role: "user" | "admin";
+      role?: "user" | "admin";
+    } & {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
   }
 }

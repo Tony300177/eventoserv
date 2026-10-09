@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
-import { cancelRegistration, createRegistration, getAdminStats, getPublicStats, listAuditLogs, listRegistrations, updateRegistration } from "./db";
-import type { TrpcContext } from "./context";
+import { cancelRegistration, createRegistration, getAdminStats, getPublicStats, listAuditLogs, listRegistrations, updateRegistration } from "./db.js";
+import type { TrpcContext } from "./context.js";
 
 const t = initTRPC.context<TrpcContext>().create({
   transformer: superjson,

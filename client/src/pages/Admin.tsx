@@ -25,7 +25,8 @@ export default function Admin() {
   const [cancelTarget, setCancelTarget] = useState<Row | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const utils = trpc.useUtils();
-  const enabled = Boolean(session?.user && (session.user as { role?: string })?.role === "admin");
+  const isAdmin = session?.user?.role === "admin";
+  const enabled = Boolean(session && isAdmin);
   const stats = trpc.registration.adminStats.useQuery(undefined, { enabled });
   const rows = trpc.registration.adminList.useQuery({ search, schoolSector, status: statusFilter, hasCompanion: companion }, { enabled });
   const update = trpc.registration.update.useMutation({ onSuccess: () => { setEditing(null); utils.registration.adminList.invalidate(); utils.registration.adminStats.invalidate(); } });
@@ -44,7 +45,7 @@ export default function Admin() {
 
   if (status === "loading") return <div className="admin-state"><div className="spinner" />Carregando sessão...</div>;
   if (!session) return <div className="admin-state"><div className="state-icon"><ShieldAlert /></div><h1>Área administrativa</h1><p>Entre com sua conta para acessar os dados de inscrição.</p><button className="button button-primary" onClick={() => signIn("google")}>Entrar com Google</button><a className="back-link" href="/"><ArrowLeft size={16} /> Voltar para inscrição</a></div>;
-  if ((session.user as { role?: string })?.role !== "admin") return <div className="admin-state"><div className="state-icon"><ShieldAlert /></div><h1>Acesso restrito</h1><p>Esta conta está autenticada, mas não possui permissão de administração.</p><a className="back-link" href="/"><ArrowLeft size={16} /> Voltar para inscrição</a></div>;
+  if (!isAdmin) return <div className="admin-state"><div className="state-icon"><ShieldAlert /></div><h1>Acesso restrito</h1><p>Esta conta está autenticada, mas não possui permissão de administração.</p><a className="back-link" href="/"><ArrowLeft size={16} /> Voltar para inscrição</a></div>;
 
   return (
     <div className="admin-shell">

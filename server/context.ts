@@ -1,25 +1,22 @@
-import { auth } from "./auth";
-import type { User } from "../drizzle/schema";
+import { auth } from "./auth.js";
+import { getUserByOpenId } from "./db.js";
+import type { User } from "../drizzle/schema.js";
 
 export type TrpcContext = {
   user: User | null;
 };
 
 export async function createContext(): Promise<TrpcContext> {
-  const session = await auth();
-  return {
-    user: session?.user?.id
-      ? {
-          id: session.user.id as number,
-          openId: session.user.email || "",
-          name: session.user.name || null,
-          email: session.user.email || null,
-          loginMethod: "google",
-          role: (session.user.role as "user" | "admin") || "user",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          lastSignedIn: new Date(),
-        }
-      : null,
-  };
+  let session: Awaited<ReturnType<typeof auth>> = null;
+  try {
+    session = await auth();
+  } catch (error) {
+    console.warn("[Auth] Session unavailable:", error instanceof Error ? error.message : error);
+  }
+
+  const email = session?.user?.email;
+  if (!email) return { user: null };
+
+  const user = await getUserByOpenId(email);
+  return { user: user ?? null };
 }

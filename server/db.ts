@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, like, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { auditLogs, eventSettings, InsertUser, registrations, Registration, users } from "../drizzle/schema";
+import { auditLogs, eventSettings, InsertUser, registrations, Registration, users } from "../drizzle/schema.js";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 export const EVENT_CAPACITY = 200;
