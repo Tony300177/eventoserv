@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { login } from "../../server/auth.js";
+import { readJsonBody } from "../../server/read-body.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -8,9 +9,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const password = typeof req.body === "object" && req.body !== null
-    ? String((req.body as { password?: unknown }).password ?? "")
-    : "";
+  const body = await readJsonBody<{ password?: unknown }>(req);
+  const password = typeof body?.password === "string" ? body.password : "";
 
   const cookie = await login(password);
   if (!cookie) {
