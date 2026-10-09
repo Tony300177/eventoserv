@@ -1,4 +1,5 @@
 {
+  "name": "eventoserv",
   "buildCommand": "vite build",
   "outputDirectory": "dist/public",
   "rewrites": [
