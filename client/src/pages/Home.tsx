@@ -9,8 +9,7 @@ type SchoolSector = typeof SCHOOLS[number];
 
 const rules = [
   "Não será permitida a entrada de crianças.",
-  "Será servido refrigerante.",
-  "Outros tipos de bebidas poderão ser levados pelo próprio participante.",
+  "Terá venda de bebidas no local.",
   "Cada funcionário poderá levar somente um acompanhante.",
   "Cada participante poderá se inscrever em apenas um dos dias (29 ou 30).",
 ];
@@ -49,7 +48,7 @@ export default function Home() {
   return <main className="public-shell">
     <section className="public-context">
       <div className="brand"><span className="brand-mark"><i /><i /></span><span>encontro</span></div>
-      <div className="context-copy"><p className="eyebrow">Fórum Permanente de Educação</p><h1>Sua presença começa aqui.</h1><p>Confirme sua participação e, se quiser, inclua uma pessoa acompanhante.</p></div>
+      <div className="context-copy"><p className="eyebrow">Jantar Dançante em Comemoração ao Dia dos Professores e ao Dia do Servidor Público!</p><h1>Sua presença começa aqui.</h1><p>Confirme sua participação e, se quiser, inclua uma pessoa acompanhante.</p></div>
       <div className="rules-block"><p className="eyebrow">Antes de continuar</p><ul>{rules.map(rule => <li key={rule}><span>•</span>{rule}</li>)}</ul></div>
       <div className="context-note"><LockKeyhole size={15} /><span>Seus dados são usados somente para organizar o evento.</span></div>
     </section>
