@@ -1,7 +1,9 @@
-import { integer, pgEnum, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { integer, pgEnum, pgTable, serial, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const userRoleEnum = pgEnum("role", ["user", "admin"]);
 export const registrationStatusEnum = pgEnum("status", ["active", "cancelled"]);
+export const eventDayEnum = pgEnum("event_day", ["29", "30"]);
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -17,7 +19,7 @@ export const users = pgTable("users", {
 
 export const eventSettings = pgTable("eventSettings", {
   id: integer("id").primaryKey(),
-  capacity: integer("capacity").notNull().default(200),
+  capacity: integer("capacity").notNull().default(400),
   occupied: integer("occupied").notNull().default(0),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
@@ -28,6 +30,8 @@ export const registrations = pgTable("registrations", {
   schoolSector: varchar("schoolSector", { length: 140 }).notNull(),
   role: varchar("role", { length: 160 }).notNull(),
   employeeName: varchar("employeeName", { length: 180 }).notNull(),
+  employeeNameKey: varchar("employeeNameKey", { length: 180 }).notNull(),
+  eventDay: eventDayEnum("eventDay").notNull(),
   hasCompanion: integer("hasCompanion").notNull().default(0),
   companionName: varchar("companionName", { length: 180 }),
   peopleCount: integer("peopleCount").notNull().default(1),
@@ -39,7 +43,11 @@ export const registrations = pgTable("registrations", {
   cancelledAt: timestamp("cancelledAt"),
   cancelledBy: integer("cancelledBy"),
   cancellationReason: text("cancellationReason"),
-});
+}, (table) => [
+  uniqueIndex("registrations_active_person_unique")
+    .on(table.employeeNameKey)
+    .where(sql`${table.status} = 'active'`),
+]);
 
 export const auditLogs = pgTable("auditLogs", {
   id: serial("id").primaryKey(),

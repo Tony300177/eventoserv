@@ -129,6 +129,10 @@ textarea { min-height: 100px; resize: vertical; }
 .big-capacity { display: flex; align-items: baseline; gap: 9px; margin: 7px 0 19px; }
 .big-capacity strong { font-size: 44px; letter-spacing: -.06em; }
 .big-capacity span { color: var(--muted); font-size: 11px; line-height: 1.15; }
+.day-capacity-rows { display: grid; gap: 11px; margin-bottom: 18px; }
+.day-capacity-row { display: grid; grid-template-columns: 52px 1fr auto; gap: 10px; align-items: center; font-size: 11px; }
+.day-capacity-row span { color: var(--muted); font-weight: 700; }
+.day-capacity-row b { color: var(--petrol); font-size: 11px; }
 .capacity-ring { display: grid; place-items: center; margin: 0 auto 16px; }
 .capacity-ring > div { width: 132px; height: 132px; border-radius: 50%; display: grid; place-items: center; position: relative; }
 .capacity-ring > div::after { content: ""; position: absolute; inset: 13px; border-radius: 50%; background: var(--white); }
@@ -137,7 +141,7 @@ textarea { min-height: 100px; resize: vertical; }
 .capacity-message { text-align: center; color: var(--sage); font-size: 11px; font-weight: 800; margin: auto 0 2px; }
 .registrations-panel { padding-bottom: 10px; }
 .registrations-heading { align-items: center; margin-bottom: 18px; }
-.filters { display: grid; grid-template-columns: 1.5fr 1.2fr .75fr 1fr; gap: 8px; margin-bottom: 15px; }
+.filters { display: grid; grid-template-columns: 1.4fr 1.1fr 1.1fr .75fr 1fr; gap: 8px; margin-bottom: 15px; }
 .filters input, .filters select { min-height: 41px; padding: 9px 11px; font-size: 11px; }
 .search-box { position: relative; }
 .search-box svg { position: absolute; left: 11px; top: 12px; color: #9ca6a7; }
@@ -153,6 +157,7 @@ td small { color: #9aa2a3; font-size: 10px; }
 .status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 5px 8px; border-radius: 30px; font-size: 10px; font-weight: 800; }
 .status-pill.active { background: #e6f1ed; color: var(--sage); }
 .status-pill.cancelled { background: #fbeceb; color: var(--danger); }
+.status-pill.day { background: #eaf2f1; color: var(--petrol-dark); }
 .action-col { text-align: right; white-space: nowrap; }
 .icon-button { border: 0; background: transparent; color: #7f8c8d; padding: 6px; border-radius: 6px; }
 .icon-button:hover { background: #edf2f1; color: var(--petrol); }
