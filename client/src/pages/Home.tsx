@@ -16,8 +16,8 @@ const rules = [
 ];
 
 type EventDay = "29" | "30";
-type FormState = { schoolSector: SchoolSector | ""; role: string; employeeName: string; eventDay: EventDay | ""; hasCompanion: boolean; companionName: string; rulesAccepted: boolean };
-const initialForm: FormState = { schoolSector: "", role: "", employeeName: "", eventDay: "", hasCompanion: false, companionName: "", rulesAccepted: false };
+type FormState = { schoolSector: SchoolSector | ""; role: string; employeeName: string; eventDay: EventDay | ""; hasCompanion: boolean; companionName: string };
+const initialForm: FormState = { schoolSector: "", role: "", employeeName: "", eventDay: "", hasCompanion: false, companionName: "" };
 
 export default function Home() {
   const [form, setForm] = useState<FormState>(initialForm);
@@ -32,14 +32,14 @@ export default function Home() {
       else setError("Não foi possível concluir agora. Confira os campos e tente novamente.");
     },
   });
-  const canSubmit = useMemo(() => Boolean(form.schoolSector && form.role.trim() && form.employeeName.trim() && form.eventDay && form.rulesAccepted && (!form.hasCompanion || form.companionName.trim())), [form]);
+  const canSubmit = useMemo(() => Boolean(form.schoolSector && form.role.trim() && form.employeeName.trim() && form.eventDay && (!form.hasCompanion || form.companionName.trim())), [form]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) { setForm(current => ({ ...current, [key]: value })); }
   function submit(event: FormEvent) {
     event.preventDefault();
     setError("");
-    if (!canSubmit) { setError("Preencha os campos obrigatórios, escolha o dia e aceite as regras do evento."); return; }
-    create.mutate({ ...form, schoolSector: form.schoolSector as SchoolSector, eventDay: form.eventDay as EventDay, rulesAccepted: true });
+    if (!canSubmit) { setError("Preencha os campos obrigatórios e escolha o dia do evento."); return; }
+    create.mutate({ ...form, schoolSector: form.schoolSector as SchoolSector, eventDay: form.eventDay as EventDay });
   }
 
   if (submitted) {
@@ -60,10 +60,10 @@ export default function Home() {
         <div className="field-group"><label htmlFor="schoolSector">Escola ou setor <span>*</span></label><select id="schoolSector" value={form.schoolSector} onChange={e => update("schoolSector", e.target.value as SchoolSector | "")}><option value="">Selecione uma opção</option>{SCHOOLS.map(school => <option key={school} value={school}>{school}</option>)}</select></div>
         <div className="field-grid"><div className="field-group"><label htmlFor="employeeName">Nome completo <span>*</span></label><input id="employeeName" value={form.employeeName} onChange={e => update("employeeName", e.target.value)} placeholder="Como devemos chamar você?" autoComplete="name" /></div><div className="field-group"><label htmlFor="role">Função <span>*</span></label><input id="role" value={form.role} onChange={e => update("role", e.target.value)} placeholder="Ex.: professora" /></div></div>
         <div className="companion-section"><div className="section-label"><span className="section-number">02</span><div><label>Acompanhante</label><p>Você poderá levar uma única pessoa.</p></div></div><div className="choice-row" role="radiogroup" aria-label="Acompanhante"><button type="button" className={`choice ${!form.hasCompanion ? "selected" : ""}`} onClick={() => { update("hasCompanion", false); update("companionName", ""); }} aria-pressed={!form.hasCompanion}>Não vou levar</button><button type="button" className={`choice ${form.hasCompanion ? "selected" : ""}`} onClick={() => update("hasCompanion", true)} aria-pressed={form.hasCompanion}>Vou levar acompanhante</button></div>{form.hasCompanion && <div className="field-group companion-input"><label htmlFor="companionName">Nome completo do acompanhante <span>*</span></label><input id="companionName" value={form.companionName} onChange={e => update("companionName", e.target.value)} placeholder="Nome da pessoa acompanhante" autoComplete="off" /></div>}</div>
-        <div className="accept-box"><input id="rulesAccepted" type="checkbox" checked={form.rulesAccepted} onChange={e => update("rulesAccepted", e.target.checked)} /><label htmlFor="rulesAccepted">Li e aceito as regras do evento. <span>*</span></label></div>
         {error && <div className="form-error" role="alert"><CircleAlert size={18} />{error}</div>}
         <div className="form-submit"><p><Info size={16} /> A inscrição só será confirmada após o envio.</p><button className="button button-primary" type="submit" disabled={create.isPending}>{create.isPending ? "Registrando..." : "Confirmar inscrição"}<ChevronRight size={17} /></button></div>
       </form>
+      <footer className="site-footer">Desenvolvido pelo Departamento de Tecnologia da SME.</footer>
     </section>
   </main>;
 }

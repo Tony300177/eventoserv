@@ -66,6 +66,7 @@ textarea { min-height: 100px; resize: vertical; }
 .form-error { display: flex; gap: 8px; align-items: center; padding: 12px 14px; background: #fff0ef; border: 1px solid #efc6c2; color: #8e3834; border-radius: 9px; font-size: 12px; margin: 16px 0; }
 .form-submit { display: flex; justify-content: space-between; gap: 24px; align-items: center; border-top: 1px solid var(--line); padding-top: 25px; }
 .form-submit p { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; margin: 0; }
+.site-footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; text-align: center; }
 .button { border: 0; border-radius: 9px; padding: 13px 17px; min-height: 45px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; font-weight: 800; font-size: 12px; transition: transform .2s, background .2s, opacity .2s; }
 .button:hover:not(:disabled) { transform: translateY(-1px); }
 .button:disabled { opacity: .55; cursor: not-allowed; }
@@ -181,6 +182,74 @@ td small { color: #9aa2a3; font-size: 10px; }
 .modal-form { display: grid; gap: 3px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 18px; }
 
-@media (max-width: 960px) { .public-shell { grid-template-columns: 1fr; } .public-context { min-height: auto; padding: 30px 25px; } .context-copy { margin: 60px 0 35px; } .context-copy h1 { font-size: 48px; } .capacity-card { max-width: none; } .context-note { margin-top: 25px; } .metric-grid { grid-template-columns: repeat(2, 1fr); } .admin-content-grid { grid-template-columns: 1fr; } }
-@media (max-width: 720px) { .public-form-area { padding: 35px 20px 45px; } .form-intro { display: block; margin-bottom: 30px; } .admin-link { display: inline-block; margin-top: 18px; } .field-grid { grid-template-columns: 1fr; gap: 0; } .form-submit { display: block; } .form-submit p { margin-bottom: 15px; } .form-submit .button { width: 100%; } .admin-sidebar { width: 65px; flex-basis: 65px; padding: 25px 9px; } .admin-sidebar .brand { margin: 0 auto 54px; } .admin-sidebar .brand > span:last-child, .sidebar-caption, .admin-sidebar nav a:not(.active)::after, .admin-sidebar nav a { font-size: 0; } .admin-sidebar nav a { justify-content: center; padding: 12px 0; } .admin-sidebar nav a svg { width: 18px; height: 18px; } .admin-sidebar nav a.active { font-size: 0; } .sidebar-bottom { padding: 16px 0 0; } .admin-identity { justify-content: center; } .admin-identity > div, .logout-button { display: none; } .admin-main { padding: 28px 16px 40px; } .admin-header { display: block; } .admin-header .back-link { margin-top: 15px; } .metric-grid { gap: 8px; } .metric-card { min-height: 132px; padding: 13px; } .metric-card strong { font-size: 31px; } .filters { grid-template-columns: 1fr 1fr; } .filters .search-box { grid-column: 1 / -1; } .registrations-heading { display: block; } .registrations-heading .button { margin-top: 14px; } .success-card { padding: 32px 22px; } }
+@media (max-width: 960px) {
+  .public-shell { grid-template-columns: 1fr; }
+  .public-context { min-height: auto; padding: 30px 25px; }
+  .context-copy { margin: 40px 0 28px; }
+  .context-copy h1 { font-size: clamp(36px, 8vw, 48px); }
+  .context-copy p:not(.eyebrow) { max-width: none; }
+  .capacity-card { max-width: none; }
+  .context-note { margin-top: 25px; }
+  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-content-grid { grid-template-columns: 1fr; }
+  .filters { grid-template-columns: 1fr 1fr; }
+  .filters .search-box { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) {
+  .public-form-area { padding: 35px 20px 45px; }
+  .form-intro { display: block; margin-bottom: 28px; }
+  .form-intro h2 { font-size: 26px; }
+  .admin-link { display: inline-block; margin-top: 18px; }
+  .field-grid { grid-template-columns: 1fr; gap: 0; }
+  .day-section .choice-row, .companion-section .choice-row { flex-direction: column; }
+  .day-section .choice, .companion-section .choice { width: 100%; text-align: center; }
+  .form-submit { display: block; }
+  .form-submit p { margin-bottom: 15px; }
+  .form-submit .button { width: 100%; }
+  .site-footer { margin-top: 28px; font-size: 10px; padding-inline: 10px; }
+  .success-shell { padding: 16px; }
+  .success-card { padding: 32px 22px; }
+  .success-card h1 { font-size: 34px; }
+  .protocol-box strong { font-size: 16px; word-break: break-all; }
+  .admin-sidebar { width: 65px; flex-basis: 65px; padding: 25px 9px; }
+  .admin-sidebar .brand { margin: 0 auto 54px; }
+  .admin-sidebar .brand > span:last-child, .sidebar-caption, .admin-sidebar nav a:not(.active)::after, .admin-sidebar nav a { font-size: 0; }
+  .admin-sidebar nav a { justify-content: center; padding: 12px 0; }
+  .admin-sidebar nav a svg { width: 18px; height: 18px; }
+  .admin-sidebar nav a.active { font-size: 0; }
+  .sidebar-bottom { padding: 16px 0 0; }
+  .admin-identity { justify-content: center; }
+  .admin-identity > div, .logout-button { display: none; }
+  .admin-main { padding: 28px 16px 40px; }
+  .admin-header { display: block; }
+  .admin-header h1 { font-size: 30px; }
+  .admin-header .back-link { margin-top: 15px; }
+  .metric-grid { gap: 8px; }
+  .metric-card { min-height: 120px; padding: 13px; }
+  .metric-card span { margin-bottom: 12px; }
+  .metric-card strong { font-size: 26px; word-break: break-word; }
+  .metric-card small { font-size: 10px; }
+  .panel { padding: 16px; }
+  .panel-heading h2 { font-size: 18px; }
+  .big-capacity strong { font-size: 36px; }
+  .filters { grid-template-columns: 1fr; }
+  .filters .search-box { grid-column: auto; }
+  .registrations-heading { display: block; }
+  .registrations-heading .button { margin-top: 14px; width: 100%; }
+  table { min-width: 640px; }
+  .modal-backdrop { padding: 12px; align-items: end; }
+  .modal-card { max-height: 92vh; border-radius: 14px 14px 0 0; padding: 20px; }
+  .modal-actions { flex-direction: column-reverse; }
+  .modal-actions .button { width: 100%; }
+}
+@media (max-width: 420px) {
+  .public-context { padding: 24px 18px; }
+  .public-form-area { padding: 28px 16px 36px; }
+  .context-copy h1 { font-size: 32px; }
+  .brand { font-size: 17px; }
+  .choice { padding: 12px; font-size: 12px; }
+  .metric-grid { grid-template-columns: 1fr; }
+  .metric-card { min-height: auto; }
+  .success-card h1 { font-size: 28px; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }

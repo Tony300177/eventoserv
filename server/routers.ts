@@ -42,14 +42,13 @@ const registrationInput = z.object({
   eventDay: z.enum(["29", "30"]),
   hasCompanion: z.boolean(),
   companionName: z.string().trim().max(180).optional(),
-  rulesAccepted: z.literal(true),
 }).superRefine((value, ctx) => {
   if (value.hasCompanion && (!value.companionName || value.companionName.trim().length < 3)) {
     ctx.addIssue({ code: "custom", path: ["companionName"], message: "Informe o nome completo do acompanhante." });
   }
 });
 
-const adminRegistrationInput = registrationInput.omit({ rulesAccepted: true });
+const adminRegistrationInput = registrationInput;
 
 export const appRouter = router({
   system: router({
