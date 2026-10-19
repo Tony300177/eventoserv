@@ -8,6 +8,7 @@ const SCHOOLS = [
 type SchoolSector = typeof SCHOOLS[number];
 
 const rules = [
+  "Não poderá levar acompanhante.",
   "Não será permitida a entrada de crianças.",
   "Será servido refrigerantes.",
   "Terá venda de bebidas no local.",
