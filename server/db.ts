@@ -132,8 +132,6 @@ export async function createRegistration(input: {
   role: string;
   employeeName: string;
   eventDay: EventDay;
-  hasCompanion: boolean;
-  companionName?: string;
 }) {
   const db = await getDb();
   if (!db) throw new Error("DATABASE_UNAVAILABLE");
@@ -142,9 +140,6 @@ export async function createRegistration(input: {
   const employeeName = cleanText(input.employeeName);
   const employeeNameKey = normalizeName(input.employeeName);
   const eventDay = input.eventDay;
-  const hasCompanion = Boolean(input.hasCompanion);
-  const companionName = input.companionName ? cleanText(input.companionName) : null;
-  const peopleCount = hasCompanion ? 2 : 1;
 
   return db.transaction(async (tx) => {
     await ensureSettings(tx);
@@ -160,7 +155,7 @@ export async function createRegistration(input: {
 
     const settingsId = daySettingsId(eventDay);
     const [settings] = await tx.select().from(eventSettings).where(eq(eventSettings.id, settingsId)).for("update");
-    if (!settings || settings.occupied + peopleCount > settings.capacity) throw new Error("NO_CAPACITY");
+    if (!settings || settings.occupied + 1 > settings.capacity) throw new Error("NO_CAPACITY");
 
     const protocol = createProtocol();
     const [inserted] = await tx.insert(registrations).values({
@@ -170,19 +165,16 @@ export async function createRegistration(input: {
       employeeName,
       employeeNameKey,
       eventDay,
-      hasCompanion: hasCompanion ? 1 : 0,
-      companionName: hasCompanion ? companionName : null,
-      peopleCount,
       status: "active",
       rulesVersion: RULES_VERSION,
       rulesAcceptedAt: new Date(),
     }).returning({ id: registrations.id });
-    await tx.update(eventSettings).set({ occupied: settings.occupied + peopleCount }).where(eq(eventSettings.id, settingsId));
-    return { id: Number(inserted.id), protocol, peopleCount, eventDay };
+    await tx.update(eventSettings).set({ occupied: settings.occupied + 1 }).where(eq(eventSettings.id, settingsId));
+    return { id: Number(inserted.id), protocol, eventDay };
   });
 }
 
-export async function listRegistrations(filters?: { search?: string; schoolSector?: string; status?: "all" | "active" | "cancelled"; hasCompanion?: "all" | "yes" | "no"; eventDay?: "all" | EventDay }) {
+export async function listRegistrations(filters?: { search?: string; schoolSector?: string; status?: "all" | "active" | "cancelled"; eventDay?: "all" | EventDay }) {
   const db = await getDb();
   if (!db) throw new Error("DATABASE_UNAVAILABLE");
   const conditions = [];
@@ -192,8 +184,6 @@ export async function listRegistrations(filters?: { search?: string; schoolSecto
   }
   if (filters?.schoolSector && filters.schoolSector !== "all") conditions.push(eq(registrations.schoolSector, filters.schoolSector));
   if (filters?.status && filters.status !== "all") conditions.push(eq(registrations.status, filters.status));
-  if (filters?.hasCompanion === "yes") conditions.push(eq(registrations.hasCompanion, 1));
-  if (filters?.hasCompanion === "no") conditions.push(eq(registrations.hasCompanion, 0));
   if (filters?.eventDay && filters.eventDay !== "all") conditions.push(eq(registrations.eventDay, filters.eventDay));
   return db.select().from(registrations).where(conditions.length ? and(...conditions) : undefined).orderBy(desc(registrations.createdAt));
 }
@@ -210,13 +200,11 @@ export async function getAdminStats() {
       schoolSector,
       registrations: sectorRows.length,
       people: sectorRows.reduce((total, row) => total + row.peopleCount, 0),
-      companions: sectorRows.reduce((total, row) => total + (row.hasCompanion ? 1 : 0), 0),
     };
   }).sort((a, b) => b.people - a.people);
   return {
     ...stats,
     employees: activeRows.length,
-    companions: activeRows.reduce((total, row) => total + (row.hasCompanion ? 1 : 0), 0),
     cancelled: rows.filter(row => row.status === "cancelled").length,
     distribution,
   };
@@ -227,15 +215,12 @@ export async function updateRegistration(id: number, input: {
   role: string;
   employeeName: string;
   eventDay: EventDay;
-  hasCompanion: boolean;
-  companionName?: string;
 }, actorUserId: number) {
   const db = await getDb();
   if (!db) throw new Error("DATABASE_UNAVAILABLE");
   return db.transaction(async (tx) => {
     const [current] = await tx.select().from(registrations).where(eq(registrations.id, id)).for("update");
     if (!current) throw new Error("NOT_FOUND");
-    const nextCount = input.hasCompanion ? 2 : 1;
     const nextDay = input.eventDay;
     const employeeNameKey = normalizeName(input.employeeName);
 
@@ -254,7 +239,6 @@ export async function updateRegistration(id: number, input: {
 
     const isActive = current.status === "active";
     const dayChanged = current.eventDay !== nextDay;
-    const countDelta = isActive ? nextCount - current.peopleCount : 0;
 
     await ensureSettings(tx);
 
@@ -263,19 +247,12 @@ export async function updateRegistration(id: number, input: {
       const toId = daySettingsId(nextDay);
       const [fromSettings] = await tx.select().from(eventSettings).where(eq(eventSettings.id, fromId)).for("update");
       const [toSettings] = await tx.select().from(eventSettings).where(eq(eventSettings.id, toId)).for("update");
-      if (!toSettings || toSettings.occupied + nextCount > toSettings.capacity) throw new Error("NO_CAPACITY");
+      if (!toSettings || toSettings.occupied + 1 > toSettings.capacity) throw new Error("NO_CAPACITY");
       if (fromSettings) {
         await tx.update(eventSettings).set({ occupied: Math.max(0, fromSettings.occupied - current.peopleCount) }).where(eq(eventSettings.id, fromId));
       }
       if (toSettings) {
-        await tx.update(eventSettings).set({ occupied: toSettings.occupied + nextCount }).where(eq(eventSettings.id, toId));
-      }
-    } else if (isActive && countDelta !== 0) {
-      const settingsId = daySettingsId(nextDay);
-      const [settings] = await tx.select().from(eventSettings).where(eq(eventSettings.id, settingsId)).for("update");
-      if (countDelta > 0 && (!settings || settings.occupied + countDelta > settings.capacity)) throw new Error("NO_CAPACITY");
-      if (settings) {
-        await tx.update(eventSettings).set({ occupied: settings.occupied + countDelta }).where(eq(eventSettings.id, settingsId));
+        await tx.update(eventSettings).set({ occupied: toSettings.occupied + 1 }).where(eq(eventSettings.id, toId));
       }
     }
 
@@ -285,9 +262,6 @@ export async function updateRegistration(id: number, input: {
       employeeName: cleanText(input.employeeName),
       employeeNameKey,
       eventDay: nextDay,
-      hasCompanion: input.hasCompanion ? 1 : 0,
-      companionName: input.hasCompanion ? cleanText(input.companionName ?? "") : null,
-      peopleCount: nextCount,
     }).where(eq(registrations.id, id));
     await tx.insert(auditLogs).values({ action: "registration.updated", registrationId: id, actorUserId, summary: `Inscrição ${current.protocol} corrigida.` });
     return { success: true };

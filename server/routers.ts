@@ -40,12 +40,6 @@ const registrationInput = z.object({
   role: z.string().trim().min(2, "Informe a função.").max(160),
   employeeName: z.string().trim().min(3, "Informe o nome completo.").max(180),
   eventDay: z.enum(["29", "30"]),
-  hasCompanion: z.boolean(),
-  companionName: z.string().trim().max(180).optional(),
-}).superRefine((value, ctx) => {
-  if (value.hasCompanion && (!value.companionName || value.companionName.trim().length < 3)) {
-    ctx.addIssue({ code: "custom", path: ["companionName"], message: "Informe o nome completo do acompanhante." });
-  }
 });
 
 const adminRegistrationInput = registrationInput;
@@ -65,7 +59,6 @@ export const appRouter = router({
       search: z.string().optional(),
       schoolSector: z.string().optional(),
       status: z.enum(["all", "active", "cancelled"]).optional(),
-      hasCompanion: z.enum(["all", "yes", "no"]).optional(),
       eventDay: z.enum(["all", "29", "30"]).optional(),
     }).optional()).query(({ input }) => listRegistrations(input)),
     audit: adminProcedure.query(() => listAuditLogs()),
