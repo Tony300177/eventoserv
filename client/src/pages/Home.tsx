@@ -51,6 +51,7 @@ export default function Home() {
       <div className="brand"><span className="brand-mark"><i /><i /></span><span>encontro</span></div>
       <div className="context-copy"><p className="eyebrow">Confirme sua participação!</p><h1>Sua presença começa aqui.</h1></div>
       <div className="rules-block"><p className="eyebrow">Antes de continuar</p><ul>{rules.map(rule => <li key={rule}><span>•</span>{rule}</li>)}</ul></div>
+      <div className="notice-block" role="note"><p className="eyebrow">Aviso</p><p>Os convites individuais serão entregues na Secretaria da Escola.</p></div>
       <div className="context-note"><LockKeyhole size={15} /><span>Seus dados são usados somente para organizar o evento.</span></div>
     </section>
     <section className="public-form-area">
