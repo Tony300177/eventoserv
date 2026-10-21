@@ -15,6 +15,24 @@ export function isEventDay(value: string): value is EventDay {
   return (EVENT_DAYS as readonly string[]).includes(value);
 }
 
+let _schemaEnsured: Promise<void> | null = null;
+async function ensureSchema(db: any) {
+  if (!_schemaEnsured) {
+    _schemaEnsured = (async () => {
+      await db.execute(sql`DO $$ BEGIN CREATE TYPE "event_day" AS ENUM ('29', '30'); EXCEPTION WHEN duplicate_object THEN null; END $$;`);
+      await db.execute(sql`ALTER TABLE "registrations" ADD COLUMN IF NOT EXISTS "eventDay" "event_day" NOT NULL DEFAULT '29'`);
+      await db.execute(sql`ALTER TABLE "registrations" ADD COLUMN IF NOT EXISTS "employeeNameKey" varchar(180)`);
+      await db.execute(sql`UPDATE "registrations" SET "employeeNameKey" = lower(regexp_replace(trim("employeeName"), '\\s+', ' ', 'g')) WHERE "employeeNameKey" IS NULL`);
+      await db.execute(sql`ALTER TABLE "registrations" ALTER COLUMN "employeeNameKey" SET NOT NULL`);
+      await db.execute(sql`CREATE UNIQUE INDEX IF NOT EXISTS "registrations_active_person_unique" ON "registrations" ("employeeNameKey") WHERE "status" = 'active'`);
+    })().catch((error) => {
+      _schemaEnsured = null;
+      throw error;
+    });
+  }
+  await _schemaEnsured;
+}
+
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -23,6 +41,13 @@ export async function getDb() {
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
+    }
+  }
+  if (_db) {
+    try {
+      await ensureSchema(_db);
+    } catch (error) {
+      console.warn("[Database] Schema ensure failed:", error);
     }
   }
   return _db;
@@ -141,7 +166,6 @@ export async function createRegistration(input: {
   const employeeNameKey = normalizeName(input.employeeName);
   const eventDay = input.eventDay;
 
-  try {
   return await db.transaction(async (tx) => {
     await ensureSettings(tx);
 
@@ -173,9 +197,6 @@ export async function createRegistration(input: {
     await tx.update(eventSettings).set({ occupied: settings.occupied + 1 }).where(eq(eventSettings.id, settingsId));
     return { id: Number(inserted.id), protocol, eventDay };
   });
-  } catch (error: any) {
-    throw new Error(`CREATE_REG_ERROR: ${error?.message ?? error} | cause: ${error?.cause?.message ?? error?.cause ?? ""}`);
-  }
 }
 
 export async function listRegistrations(filters?: { search?: string; schoolSector?: string; status?: "all" | "active" | "cancelled"; eventDay?: "all" | EventDay }) {
