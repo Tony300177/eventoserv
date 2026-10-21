@@ -10,7 +10,7 @@ type SchoolSector = typeof SCHOOLS[number];
 const rules = [
   "Não poderá levar acompanhante.",
   "Não será permitida a entrada de crianças.",
-  "Serão servidos refrigerantes.",
+  "Será servido refrigerantes.",
   "Outros tipos de bebidas poderão ser levados pelo próprio participante.",
   "Haverá venda de bebidas no local.",
   "Cada participante poderá se inscrever em apenas um dos dias (29 ou 30).",
