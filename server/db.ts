@@ -141,7 +141,8 @@ export async function createRegistration(input: {
   const employeeNameKey = normalizeName(input.employeeName);
   const eventDay = input.eventDay;
 
-  return db.transaction(async (tx) => {
+  try {
+  return await db.transaction(async (tx) => {
     await ensureSettings(tx);
 
     const [existing] = await tx
@@ -172,6 +173,9 @@ export async function createRegistration(input: {
     await tx.update(eventSettings).set({ occupied: settings.occupied + 1 }).where(eq(eventSettings.id, settingsId));
     return { id: Number(inserted.id), protocol, eventDay };
   });
+  } catch (error: any) {
+    throw new Error(`CREATE_REG_ERROR: ${error?.message ?? error} | cause: ${error?.cause?.message ?? error?.cause ?? ""}`);
+  }
 }
 
 export async function listRegistrations(filters?: { search?: string; schoolSector?: string; status?: "all" | "active" | "cancelled"; eventDay?: "all" | EventDay }) {
