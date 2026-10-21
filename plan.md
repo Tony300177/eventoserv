@@ -114,8 +114,6 @@ Na página pública, uma coluna lateral contextual apresenta a capacidade e as r
 
 Direta, cordial e institucional sem formalismo excessivo.
 
-- Headline: “Sua presença começa aqui.”
-- Manchete principal: “Encontro de quem faz a Educação acontecer.”
 - Confirmação: “Inscrição registrada. Até o encontro.”
 
 ### Wordmark e cor proprietária
