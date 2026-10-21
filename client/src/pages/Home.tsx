@@ -13,7 +13,7 @@ const rules = [
   "Será servido refrigerantes.",
   "Outros tipos de bebidas poderão ser levados pelo próprio participante.",
   "Haverá venda de bebidas no local.",
-  "Cada participante poderá se inscrever em apenas um dos dias (29 ou 30).",
+  "Cada participante poderá se inscrever em apenas um dos dias (29 ou 30 de outubro/26).",
 ];
 
 type EventDay = "29" | "30";
