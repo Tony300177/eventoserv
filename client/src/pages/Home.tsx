@@ -54,7 +54,7 @@ export default function Home() {
         <div className="event-info-item"><MapPin size={17} /><span>Local</span><strong>SIMNO</strong></div>
         <div className="event-info-item"><Clock size={17} /><span>Horário</span><strong>19:00 horas</strong></div>
       </div>
-      <div className="rules-block"><p className="eyebrow">Antes de continuar</p><ul>{rules.map(rule => <li key={rule}><span>•</span>{rule}</li>)}</ul></div>
+      <div className="rules-block"><p className="eyebrow">INFORMAÇÕES</p><ul>{rules.map(rule => <li key={rule}><span>•</span>{rule}</li>)}</ul></div>
       <div className="notice-block" role="note"><p className="eyebrow">Aviso</p><p>Os convites individuais serão entregues na Secretaria da Escola.</p></div>
       <div className="context-note"><LockKeyhole size={15} /><span>Seus dados são usados somente para organizar o evento.</span></div>
     </section>
