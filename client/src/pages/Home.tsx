@@ -49,7 +49,7 @@ export default function Home() {
 
   return <main className="public-shell">
     <section className="public-context">
-      <div className="brand"><span className="brand-mark"><i /><i /></span></div>
+      <div className="brand"><span className="brand-mark"><i /></span></div>
       <div className="context-copy"><p className="context-event">Encontro de quem faz a Educação acontecer.</p><p className="context-sub">Celebrar pessoas, reconhecer história e valorizar quem transforma vidas.</p></div>
       <div className="event-info">
         <div className="event-info-item"><MapPin size={17} /><span>Local</span><strong>SIMNO</strong></div>

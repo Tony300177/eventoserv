@@ -118,7 +118,7 @@ Direta, cordial e institucional sem formalismo excessivo.
 
 ### Wordmark e cor proprietária
 
-Sem wordmark textual: a marca é composta apenas pelo símbolo de dois pontos circulares, em Manrope, e pela manchete “Encontro de quem faz a Educação acontecer.” no topo do painel lateral. Cor proprietária: `#0F4C5C` (azul-petróleo de serviço).
+Sem wordmark textual: a marca é composta apenas pelo símbolo de um ponto circular, em Manrope. Cor proprietária: `#0F4C5C` (azul-petróleo de serviço).
 
 ## Fluxos principais
 
