@@ -12,9 +12,9 @@ h1, h2, h3, strong, .brand, .metric-card strong { font-family: Manrope, Inter, u
 a { color: inherit; text-decoration: none; }
 
 .public-shell { min-height: 100vh; display: grid; grid-template-columns: minmax(300px, 0.82fr) minmax(560px, 1.18fr); }
-.public-context { background: linear-gradient(168deg, #00a642 0%, #009c3b 44%, #00852f 100%); color: #f3f7f5; padding: 42px clamp(30px, 5vw, 80px) 34px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-.public-context::before { content: ""; position: absolute; inset: 0; background: radial-gradient(560px 340px at 10% -10%, rgba(255,255,255,.16), transparent 70%); pointer-events: none; }
-.public-context::after { content: ""; position: absolute; width: 420px; height: 420px; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; right: -190px; bottom: -130px; box-shadow: 0 0 0 26px rgba(255,255,255,.025), 0 0 0 52px rgba(255,255,255,.018); }
+.public-context { background: linear-gradient(168deg, #1f6f4b 0%, #195a3d 44%, #134730 100%); color: #f3f7f5; padding: 42px clamp(30px, 5vw, 80px) 34px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.public-context::before { content: ""; position: absolute; inset: 0; background: radial-gradient(560px 340px at 10% -10%, rgba(255,255,255,.12), transparent 70%); pointer-events: none; }
+.public-context::after { content: ""; position: absolute; width: 420px; height: 420px; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; right: -190px; bottom: -130px; box-shadow: 0 0 0 26px rgba(255,255,255,.02), 0 0 0 52px rgba(255,255,255,.015); }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; letter-spacing: -.04em; font-weight: 800; position: relative; z-index: 1; }
 .brand-mark { display: inline-flex; gap: 4px; align-items: center; padding: 9px 12px; border: 1px solid rgba(255,255,255,.24); border-radius: 12px; background: rgba(255,255,255,.1); box-shadow: inset 0 1px 0 rgba(255,255,255,.22); }
 .brand-mark i { display: block; width: 9px; height: 9px; border: 2px solid currentColor; border-radius: 50%; }
@@ -25,7 +25,7 @@ a { color: inherit; text-decoration: none; }
 .context-copy h1 { margin: 0 0 18px; max-width: 440px; font-size: clamp(22px, 2.6vw, 32px); line-height: 1.15; letter-spacing: -.03em; font-weight: 700; }
 .context-copy .context-sub { max-width: 400px; margin: 0; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.24); color: #eaf9ee; font-size: 15px; line-height: 1.6; }
 .context-copy p:not(.eyebrow) { max-width: 360px; color: #c0d3d1; font-size: 16px; line-height: 1.6; }
-.context-copy p.context-event { margin: 0 0 18px; max-width: 440px; color: #f3f7f5; font-family: Manrope, Inter, sans-serif; font-weight: 800; font-size: clamp(32px, 3.6vw, 54px); line-height: 1.02; letter-spacing: -.05em; text-shadow: 0 2px 20px rgba(0,60,20,.22); }
+.context-copy p.context-event { margin: 0 0 18px; max-width: 440px; color: #f3f7f5; font-family: Manrope, Inter, sans-serif; font-weight: 800; font-size: clamp(32px, 3.6vw, 54px); line-height: 1.02; letter-spacing: -.05em; text-shadow: 0 2px 20px rgba(0,0,0,.25); }
 .capacity-card { width: min(100%, 410px); padding: 20px; border: 1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.13); border-radius: var(--radius); position: relative; z-index: 1; }
 .capacity-head, .capacity-foot { display: flex; justify-content: space-between; align-items: center; color: #dff6e4; font-size: 12px; }
 .capacity-numbers { display: flex; align-items: baseline; gap: 12px; margin: 14px 0 18px; }
@@ -34,19 +34,19 @@ a { color: inherit; text-decoration: none; }
 .progress-track { height: 7px; border-radius: 10px; background: rgba(255,255,255,.13); overflow: hidden; margin-bottom: 11px; }
 .progress-track span { display: block; height: 100%; background: var(--amber); border-radius: inherit; transition: width .3s ease; }
 .capacity-foot { font-size: 11px; }
-.event-info { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.16); border-radius: 14px; overflow: hidden; margin: 0 0 18px; position: relative; z-index: 1; }
+.event-info { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid rgba(255,255,255,.16); background: rgba(0,0,0,.2); border-radius: 14px; overflow: hidden; margin: 0 0 18px; position: relative; z-index: 1; }
 .event-info-item { display: grid; grid-template-columns: auto 1fr; column-gap: 11px; align-items: center; padding: 14px 18px; }
 .event-info-item + .event-info-item { border-left: 1px solid rgba(255,255,255,.14); }
 .event-info-item svg { grid-row: 1 / span 2; color: var(--amber); }
 .event-info-item span { font-size: 10px; text-transform: uppercase; letter-spacing: .16em; font-weight: 800; color: #dff6e4; }
 .event-info-item strong { font-size: 16px; color: #fff; letter-spacing: -.03em; }
-.rules-block { margin: 0 0 18px; padding: 17px 19px; border: 1px solid rgba(255,255,255,.16); background: rgba(0,0,0,.13); border-radius: 14px; position: relative; z-index: 1; }
+.rules-block { margin: 0 0 18px; padding: 17px 19px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.18); border-radius: 14px; position: relative; z-index: 1; }
 .rules-block .eyebrow { color: var(--amber); margin-bottom: 13px; }
 .rules-block ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
 .rules-block li { display: flex; gap: 9px; color: #eaf9ee; font-size: 12px; line-height: 1.4; }
 .rules-block li span { color: var(--amber); font-size: 16px; line-height: 12px; }
 .context-note { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 32px; color: #d6f2dc; font-size: 11px; position: relative; z-index: 1; }
-.notice-block { margin: 0 0 18px; padding: 15px 17px; background: rgba(0,0,0,.16); border: 1px solid rgba(255,255,255,.14); border-left: 3px solid var(--amber); border-radius: 0 12px 12px 0; position: relative; z-index: 1; }
+.notice-block { margin: 0 0 18px; padding: 15px 17px; background: rgba(0,0,0,.2); border: 1px solid rgba(255,255,255,.14); border-left: 3px solid var(--amber); border-radius: 0 12px 12px 0; position: relative; z-index: 1; }
 .notice-block .eyebrow { color: var(--amber); margin-bottom: 7px; }
 .notice-block p:not(.eyebrow) { margin: 0; color: #eaf2f1; font-size: 13px; line-height: 1.5; }
 .public-form-area { padding: 55px clamp(30px, 6vw, 100px) 60px; background: #f6f4ec; }
