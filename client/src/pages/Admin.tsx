@@ -90,7 +90,7 @@ export default function Admin() {
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <div className="brand"><span className="brand-mark"><i /><i /></span><span>encontro</span></div>
+        <div className="brand"><span className="brand-mark"><i /><i /></span></div>
         <div className="sidebar-caption">Gestão do evento</div>
         <nav><a className="active" href="#visao-geral"><BarChart3 size={17} /> Visão geral</a><a href="#inscricoes"><UsersRound size={17} /> Inscrições</a></nav>
         <div className="sidebar-bottom"><div className="admin-identity"><span className="avatar"><UserRound size={15} /></span><div><strong>{session?.name || "Administrador"}</strong><small>Administrador</small></div></div><button className="logout-button" onClick={() => logout()}><LogOut size={16} /> Sair</button></div>

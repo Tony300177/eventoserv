@@ -115,11 +115,12 @@ Na página pública, uma coluna lateral contextual apresenta a capacidade e as r
 Direta, cordial e institucional sem formalismo excessivo.
 
 - Headline: “Sua presença começa aqui.”
+- Manchete principal: “Encontro de quem faz a Educação acontecer.”
 - Confirmação: “Inscrição registrada. Até o encontro.”
 
 ### Wordmark e cor proprietária
 
-Wordmark “encontro” em Manrope semibold, acompanhado de dois pontos circulares conectados por uma linha curta. Cor proprietária: `#0F4C5C` (azul-petróleo de serviço).
+Sem wordmark textual: a marca é composta apenas pelo símbolo de dois pontos circulares, em Manrope, e pela manchete “Encontro de quem faz a Educação acontecer.” no topo do painel lateral. Cor proprietária: `#0F4C5C` (azul-petróleo de serviço).
 
 ## Fluxos principais
 

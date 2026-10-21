@@ -1,5 +1,5 @@
 import { FormEvent, useMemo, useState } from "react";
-import { Check, ChevronRight, CircleAlert, Info, LockKeyhole } from "lucide-react";
+import { Check, ChevronRight, CircleAlert, Clock, Info, LockKeyhole, MapPin } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 const SCHOOLS = [
@@ -44,18 +44,23 @@ export default function Home() {
   }
 
   if (submitted) {
-    return <main className="public-shell success-shell"><section className="success-card" aria-live="polite"><div className="success-mark"><Check size={34} strokeWidth={2.5} /></div><p className="eyebrow">Inscrição registrada</p><h1>Até o encontro.</h1><p className="success-lede">Sua presença foi confirmada para o <b>Dia {submitted.eventDay} de Outubro</b>. Guarde o protocolo abaixo para consultar com a organização, se necessário.</p><div className="protocol-box"><span>Protocolo</span><strong>{submitted.protocol}</strong><small>1 pessoa contabilizada</small></div><button className="button button-primary" onClick={() => { setForm(initialForm); setSubmitted(null); }}>Fazer outra inscrição <ChevronRight size={17} /></button></section></main>;
+    return <main className="public-shell success-shell"><section className="success-card" aria-live="polite"><div className="success-mark"><Check size={34} strokeWidth={2.5} /></div><p className="eyebrow">Inscrição registrada</p><h1>Até o encontro.</h1><p className="success-lede">Sua presença foi confirmada para o <b>Dia {submitted.eventDay} de Outubro</b>. Guarde o protocolo abaixo para consultar com a organização, se necessário.</p><div className="success-event-info"><span><MapPin size={14} />SIMNO</span><span><Clock size={14} />19:00 horas</span></div><div className="protocol-box"><span>Protocolo</span><strong>{submitted.protocol}</strong><small>1 pessoa contabilizada</small></div><button className="button button-primary" onClick={() => { setForm(initialForm); setSubmitted(null); }}>Fazer outra inscrição <ChevronRight size={17} /></button></section></main>;
   }
 
   return <main className="public-shell">
     <section className="public-context">
-      <div className="brand"><span className="brand-mark"><i /><i /></span><span>encontro</span></div>
-      <div className="context-copy"><p className="eyebrow">Confirme sua participação!</p><p className="context-event">Comemoração ao Dia do Professor e do Funcionário Público.</p><h1>Sua presença começa aqui.</h1></div>
+      <div className="brand"><span className="brand-mark"><i /><i /></span></div>
+      <div className="context-copy"><p className="context-event">Encontro de quem faz a Educação acontecer.</p><h1>Sua presença começa aqui.</h1><p className="context-sub">Celebrar pessoas, reconhecer história e valorizar quem transforma vidas.</p></div>
+      <div className="event-info">
+        <div className="event-info-item"><MapPin size={17} /><span>Local</span><strong>SIMNO</strong></div>
+        <div className="event-info-item"><Clock size={17} /><span>Horário</span><strong>19:00 horas</strong></div>
+      </div>
       <div className="rules-block"><p className="eyebrow">Antes de continuar</p><ul>{rules.map(rule => <li key={rule}><span>•</span>{rule}</li>)}</ul></div>
       <div className="notice-block" role="note"><p className="eyebrow">Aviso</p><p>Os convites individuais serão entregues na Secretaria da Escola.</p></div>
       <div className="context-note"><LockKeyhole size={15} /><span>Seus dados são usados somente para organizar o evento.</span></div>
     </section>
     <section className="public-form-area">
+      <div className="form-card">
       <div className="form-intro"><div><p className="eyebrow">01 / Inscrição</p><h2>Confirme seus dados</h2><p>Os campos marcados com <b>*</b> são obrigatórios.</p></div><a className="admin-link" href="/admin">Área administrativa</a></div>
       <form className="registration-form" onSubmit={submit} noValidate>
         <div className="form-section day-section"><div className="section-label"><span className="section-number">01</span><div><label>Dia do evento <span>*</span></label><p>Escolha um dos dias. Só é permitida uma inscrição por pessoa.</p></div></div><div className="choice-row" role="radiogroup" aria-label="Dia do evento"><button type="button" className={`choice ${form.eventDay === "29" ? "selected" : ""}`} onClick={() => update("eventDay", "29")} aria-pressed={form.eventDay === "29"}>Dia 29 de Outubro</button><button type="button" className={`choice ${form.eventDay === "30" ? "selected" : ""}`} onClick={() => update("eventDay", "30")} aria-pressed={form.eventDay === "30"}>Dia 30 de Outubro</button></div></div>
@@ -64,6 +69,7 @@ export default function Home() {
         {error && <div className="form-error" role="alert"><CircleAlert size={18} />{error}</div>}
         <div className="form-submit"><p><Info size={16} /> A inscrição só será confirmada após o envio.</p><button className="button button-primary" type="submit" disabled={create.isPending}>{create.isPending ? "Registrando..." : "Confirmar inscrição"}<ChevronRight size={17} /></button></div>
       </form>
+      </div>
       <footer className="site-footer">Desenvolvido pelo Departamento de Tecnologia da SME.</footer>
     </section>
   </main>;
