@@ -8,12 +8,12 @@ const SCHOOLS = [
 type SchoolSector = typeof SCHOOLS[number];
 
 const rules = [
-  "Não poderá levar acompanhante.",
   "Não será permitida a entrada de crianças.",
   "Será servido refrigerantes.",
   "Outros tipos de bebidas poderão ser levados pelo próprio participante.",
   "Haverá venda de bebidas no local.",
   "Cada participante poderá se inscrever em apenas um dos dias (29 ou 30 de outubro/26).",
+  "A participação será individual, não sendo permitida a presença de acompanhantes.",
 ];
 
 type EventDay = "29" | "30";
