@@ -315,3 +315,71 @@ export async function listAuditLogs() {
   if (!db) throw new Error("DATABASE_UNAVAILABLE");
   return db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).limit(40);
 }
+
+export async function generateRegistrationReport() {
+  const db = await getDb();
+  if (!db) throw new Error("DATABASE_UNAVAILABLE");
+  const rows = await db.select().from(registrations).orderBy(asc(registrations.eventDay), asc(registrations.schoolSector), asc(registrations.employeeName));
+
+  const pdf = await import("pdfkit"); // @ts-ignore
+  const doc = new pdf();
+
+  return new Promise<string>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    doc.on("data", (chunk: Buffer) => chunks.push(chunk));
+    doc.on("error", reject);
+
+    doc.fontSize(12).text("Relatório de Inscrições - Evento", { underline: true });
+    doc.ln(8);
+
+    const byDay: Record<string, { title: string; rows: typeof rows }> = {
+      "29": { title: "Dia 29 de Outubro", rows: [] as typeof rows },
+      "30": { title: "Dia 30 de Outubro", rows: [] as typeof rows },
+    };
+    const bySchool: Map<string, typeof rows> = new Map();
+
+    for (const row of rows) {
+      if (row.eventDay === "29" || row.eventDay === "30") {
+        byDay[row.eventDay].rows.push(row);
+      }
+      if (!bySchool.has(row.schoolSector)) {
+        bySchool.set(row.schoolSector, []);
+      }
+      bySchool.get(row.schoolSector)!.push(row);
+    }
+
+    doc.fontSize(13).text("Por Dia", { underline: true });
+    doc.ln(4);
+
+    for (const day of ["29", "30"]) {
+      const section = byDay[day];
+      if (section.rows.length > 0) {
+        doc.fontSize(12).text(section.title, { bold: true });
+        doc.ln(2);
+        for (const row of section.rows) {
+          const statusText = row.status === "active" ? "Ativa" : "Cancelada";
+          doc.text(`• ${row.employeeName} - ${row.protocol} [${row.eventDay}/10] - ${row.schoolSector} - ${statusText} ${row.peopleCount} pessoa(s)`);
+        }
+        doc.ln(4);
+      }
+    }
+
+    doc.fontSize(13).text("Por Escola/Setor", { underline: true, bold: true });
+    doc.ln(4);
+
+    const sortedSchools = Array.from(bySchool.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+    for (const [schoolSector, schoolRows] of sortedSchools) {
+      doc.fontSize(12).text(schoolSector, { bold: true });
+      doc.ln(2);
+      for (const row of schoolRows) {
+        const statusText = row.status === "active" ? "Ativa" : "Cancelada";
+        doc.text(`• ${row.employeeName} - ${row.protocol} - ${row.eventDay}/10 - ${statusText} ${row.peopleCount} pessoa(s)`);
+      }
+      doc.ln(4);
+    }
+
+    doc.end();
+    const pdfBuffer = Buffer.concat(chunks);
+    resolve(pdfBuffer.toString("base64"));
+  });
+}

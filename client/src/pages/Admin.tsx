@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { ArrowLeft, BarChart3, Check, CircleAlert, Download, LogOut, Pencil, Search, ShieldAlert, UserRound, UsersRound, X } from "lucide-react";
+import { ArrowLeft, BarChart3, Check, CircleAlert, Download, FileText, LogOut, Pencil, Search, ShieldAlert, UserRound, UsersRound, X } from "lucide-react";
 import { useSession, useLogin, useLogout } from "@/lib/session";
 import { trpc } from "@/lib/trpc";
 
@@ -35,6 +35,7 @@ export default function Admin() {
   const rows = trpc.registration.adminList.useQuery({ search, schoolSector, status: statusFilter, eventDay: dayFilter }, { enabled });
   const update = trpc.registration.update.useMutation({ onSuccess: () => { setEditing(null); utils.registration.adminList.invalidate(); utils.registration.adminStats.invalidate(); } });
   const cancel = trpc.registration.cancel.useMutation({ onSuccess: () => { setCancelTarget(null); setCancelReason(""); utils.registration.adminList.invalidate(); utils.registration.adminStats.invalidate(); } });
+  const { mutate: exportReport } = trpc.registration.report.useMutation();
   const maxDistribution = useMemo(() => Math.max(...(stats.data?.distribution?.map(item => item.people) ?? [1])), [stats.data]);
   const day29 = stats.data?.days?.["29"];
   const day30 = stats.data?.days?.["30"];
@@ -49,6 +50,15 @@ export default function Admin() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url; anchor.download = "inscricoes-evento.csv"; anchor.click(); URL.revokeObjectURL(url);
+  }
+
+  function exportPdf() {
+    // @ts-ignore
+    exportReport().then((base64: string) => {
+      const url = `data:application/pdf;base64,${base64}`;
+      const anchor = document.createElement("a");
+      anchor.href = url; anchor.download = "relatorio-inscricoes.pdf"; anchor.click();
+    });
   }
 
   if (isLoading) return <div className="admin-state"><div className="spinner" />Carregando sessão...</div>;
@@ -113,7 +123,7 @@ export default function Admin() {
           </div>
         </section>
         <section className="panel registrations-panel" id="inscricoes">
-          <div className="panel-heading registrations-heading"><div><p className="eyebrow">Base de servidores</p><h2>Inscrições</h2></div><button className="button button-outline" onClick={exportCsv}><Download size={16} /> Exportar CSV</button></div>
+          <div className="panel-heading registrations-heading"><div><p className="eyebrow">Base de servidores</p><h2>Inscrições</h2></div><button className="button button-outline" onClick={exportCsv}><Download size={16} /> Exportar CSV</button><button className="button button-outline" onClick={exportPdf}><FileText size={16} /> Exportar PDF</button></div>
           <div className="filters"><div className="search-box"><Search size={16} /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nome ou protocolo" /></div><select value={dayFilter} onChange={e => setDayFilter(e.target.value as typeof dayFilter)}><option value="all">Todos os dias</option><option value="29">Dia 29 de Outubro</option><option value="30">Dia 30 de Outubro</option></select><select value={schoolSector} onChange={e => setSchoolSector(e.target.value)}><option value="all">Todas as escolas/setores</option>{SCHOOLS.map(school => <option key={school} value={school}>{school}</option>)}</select><select value={statusFilter} onChange={e => setStatusFilter(e.target.value as typeof statusFilter)}><option value="active">Ativas</option><option value="cancelled">Canceladas</option><option value="all">Todas as situações</option></select></div>
           <div className="table-wrap"><table><thead><tr><th>Servidor</th><th>Dia</th><th>Escola/setor</th><th>Qtd.</th><th>Situação</th><th className="action-col">Ações</th></tr></thead><tbody>{rows.data?.map(row => <tr key={row.id}><td><strong>{row.employeeName}</strong><small>{row.protocol} · {row.role}</small></td><td><span className="status-pill day">{row.eventDay}/10</span></td><td>{row.schoolSector}</td><td>{row.peopleCount}</td><td><span className={`status-pill ${row.status}`}>{row.status === "active" ? <><Check size={13} /> Ativa</> : <><X size={13} /> Cancelada</>}</span></td><td className="action-col"><button className="icon-button" title="Editar inscrição" onClick={() => setEditing(row)}><Pencil size={16} /></button>{row.status === "active" && <button className="icon-button danger" title="Cancelar inscrição" onClick={() => setCancelTarget(row)}><X size={16} /></button>}</td></tr>)}{!rows.data?.length && <tr><td colSpan={6} className="empty-cell">Nenhuma inscrição encontrada.</td></tr>}</tbody></table></div>
         </section>

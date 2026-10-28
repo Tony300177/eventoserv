@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
-import { cancelRegistration, createRegistration, getAdminStats, getPublicStats, listAuditLogs, listRegistrations, updateRegistration } from "./db.js";
+import { cancelRegistration, createRegistration, generateRegistrationReport, getAdminStats, getPublicStats, listAuditLogs, listRegistrations, updateRegistration } from "./db.js";
 import type { TrpcContext } from "./context.js";
 
 const t = initTRPC.context<TrpcContext>().create({
@@ -62,6 +62,7 @@ export const appRouter = router({
       eventDay: z.enum(["all", "29", "30"]).optional(),
     }).optional()).query(({ input }) => listRegistrations(input)),
     audit: adminProcedure.query(() => listAuditLogs()),
+    report: adminProcedure.mutation(() => generateRegistrationReport()),
     update: adminProcedure.input(z.object({ id: z.number().int().positive(), data: adminRegistrationInput })).mutation(({ input, ctx }) => updateRegistration(input.id, input.data, ctx.user.id)),
     cancel: adminProcedure.input(z.object({ id: z.number().int().positive(), reason: z.string().trim().min(3).max(500) })).mutation(({ input, ctx }) => cancelRegistration(input.id, input.reason, ctx.user.id)),
   }),
