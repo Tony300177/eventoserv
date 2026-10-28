@@ -49,6 +49,20 @@ export const registrations = pgTable("registrations", {
     .where(sql`${table.status} = 'active'`),
 ]);
 
+export const leadershipRegistrations = pgTable("leadershipRegistrations", {
+  id: serial("id").primaryKey(),
+  protocol: varchar("protocol", { length: 24 }).notNull().unique(),
+  fullName: varchar("fullName", { length: 180 }).notNull(),
+  fullNameKey: varchar("fullNameKey", { length: 180 }).notNull(),
+  sector: varchar("sector", { length: 180 }).notNull(),
+  status: registrationStatusEnum("status").default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("leadership_active_person_unique")
+    .on(table.fullNameKey)
+    .where(sql`${table.status} = 'active'`),
+]);
+
 export const auditLogs = pgTable("auditLogs", {
   id: serial("id").primaryKey(),
   action: varchar("action", { length: 80 }).notNull(),
@@ -61,4 +75,5 @@ export const auditLogs = pgTable("auditLogs", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Registration = typeof registrations.$inferSelect;
+export type LeadershipRegistration = typeof leadershipRegistrations.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;

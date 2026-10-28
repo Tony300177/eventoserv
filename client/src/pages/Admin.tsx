@@ -33,6 +33,7 @@ export default function Admin() {
   const enabled = isAdmin;
   const stats = trpc.registration.adminStats.useQuery(undefined, { enabled });
   const rows = trpc.registration.adminList.useQuery({ search, schoolSector, status: statusFilter, eventDay: dayFilter }, { enabled });
+  const leadership = trpc.leadership.adminList.useQuery(undefined, { enabled });
   const update = trpc.registration.update.useMutation({ onSuccess: () => { setEditing(null); utils.registration.adminList.invalidate(); utils.registration.adminStats.invalidate(); } });
   const cancel = trpc.registration.cancel.useMutation({ onSuccess: () => { setCancelTarget(null); setCancelReason(""); utils.registration.adminList.invalidate(); utils.registration.adminStats.invalidate(); } });
   const { mutate: exportReport } = trpc.registration.report.useMutation();
@@ -101,7 +102,7 @@ export default function Admin() {
     <div className="admin-shell">
       <aside className="admin-sidebar">
         <div className="sidebar-caption">Gestão do evento</div>
-        <nav><a className="active" href="#visao-geral"><BarChart3 size={17} /> Visão geral</a><a href="#inscricoes"><UsersRound size={17} /> Inscrições</a></nav>
+        <nav><a className="active" href="#visao-geral"><BarChart3 size={17} /> Visão geral</a><a href="#inscricoes"><UsersRound size={17} /> Inscrições</a><a href="#liderancas"><UserRound size={17} /> Lideranças</a></nav>
         <div className="sidebar-bottom"><div className="admin-identity"><span className="avatar"><UserRound size={15} /></span><div><strong>{session?.name || "Administrador"}</strong><small>Administrador</small></div></div><button className="logout-button" onClick={() => logout()}><LogOut size={16} /> Sair</button></div>
       </aside>
       <main className="admin-main">
@@ -126,6 +127,10 @@ export default function Admin() {
           <div className="panel-heading registrations-heading"><div><p className="eyebrow">Base de servidores</p><h2>Inscrições</h2></div><button className="button button-outline" onClick={exportCsv}><Download size={16} /> Exportar CSV</button><button className="button button-outline" onClick={exportPdf}><FileText size={16} /> Exportar PDF</button></div>
           <div className="filters"><div className="search-box"><Search size={16} /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nome ou protocolo" /></div><select value={dayFilter} onChange={e => setDayFilter(e.target.value as typeof dayFilter)}><option value="all">Todos os dias</option><option value="29">Dia 29 de Outubro</option><option value="30">Dia 30 de Outubro</option></select><select value={schoolSector} onChange={e => setSchoolSector(e.target.value)}><option value="all">Todas as escolas/setores</option>{SCHOOLS.map(school => <option key={school} value={school}>{school}</option>)}</select><select value={statusFilter} onChange={e => setStatusFilter(e.target.value as typeof statusFilter)}><option value="active">Ativas</option><option value="cancelled">Canceladas</option><option value="all">Todas as situações</option></select></div>
           <div className="table-wrap"><table><thead><tr><th>Servidor</th><th>Dia</th><th>Escola/setor</th><th>Qtd.</th><th>Situação</th><th className="action-col">Ações</th></tr></thead><tbody>{rows.data?.map(row => <tr key={row.id}><td><strong>{row.employeeName}</strong><small>{row.protocol} · {row.role}</small></td><td><span className="status-pill day">{row.eventDay}/10</span></td><td>{row.schoolSector}</td><td>{row.peopleCount}</td><td><span className={`status-pill ${row.status}`}>{row.status === "active" ? <><Check size={13} /> Ativa</> : <><X size={13} /> Cancelada</>}</span></td><td className="action-col"><button className="icon-button" title="Editar inscrição" onClick={() => setEditing(row)}><Pencil size={16} /></button>{row.status === "active" && <button className="icon-button danger" title="Cancelar inscrição" onClick={() => setCancelTarget(row)}><X size={16} /></button>}</td></tr>)}{!rows.data?.length && <tr><td colSpan={6} className="empty-cell">Nenhuma inscrição encontrada.</td></tr>}</tbody></table></div>
+        </section>
+        <section className="panel leadership-panel" id="liderancas">
+          <div className="panel-heading"><div><p className="eyebrow">Presença nos dois dias</p><h2>Lideranças</h2></div><span className="panel-count">{leadership.data?.length ?? 0} inscritos</span></div>
+          <div className="table-wrap"><table><thead><tr><th>Nome</th><th>Setor</th><th>Protocolo</th><th>Data</th></tr></thead><tbody>{leadership.data?.map(row => <tr key={row.id}><td><strong>{row.fullName}</strong><small>Dias 29 e 30</small></td><td>{row.sector}</td><td>{row.protocol}</td><td>{new Date(row.createdAt).toLocaleString("pt-BR")}</td></tr>)}{!leadership.data?.length && <tr><td colSpan={4} className="empty-cell">Nenhuma inscrição de liderança encontrada.</td></tr>}</tbody></table></div>
         </section>
       </main>
       {editing && <EditDialog row={editing} onClose={() => setEditing(null)} onSave={data => update.mutate({ id: editing.id, data })} pending={update.isPending} />}

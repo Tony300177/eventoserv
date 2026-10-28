@@ -103,6 +103,20 @@ textarea { min-height: 100px; resize: vertical; }
 .protocol-box span { text-transform: uppercase; letter-spacing: .14em; font-size: 10px; color: var(--muted); font-weight: 800; }
 .protocol-box strong { font: 800 20px Manrope; color: var(--petrol); letter-spacing: .03em; }
 .protocol-box small { color: var(--muted); }
+.leadership-card { max-width: 850px; margin: 18px auto 0; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: clamp(24px, 3vw, 40px); box-shadow: 0 30px 70px -45px rgba(15,76,92,.55); }
+.leadership-intro { display: flex; gap: 15px; align-items: flex-start; padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.leadership-badge { flex: 0 0 auto; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: #e5f0ed; color: var(--petrol); }
+.leadership-intro .eyebrow { color: var(--sage); margin-bottom: 7px; }
+.leadership-intro h2 { margin: 0 0 7px; font-size: 23px; letter-spacing: -.045em; }
+.leadership-intro p:not(.eyebrow) { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.leadership-success { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; background: #eef6f1; border: 1px solid #cfe3d8; border-radius: 12px; padding: 18px 20px; }
+.leadership-success .success-mark { width: 44px; height: 44px; margin: 0; }
+.leadership-success > div:not(.success-mark) { flex: 1; min-width: 220px; }
+.leadership-success strong { display: block; color: var(--petrol); font-size: 15px; margin-bottom: 4px; }
+.leadership-success p { margin: 0; color: var(--muted); font-size: 12px; }
+.leadership-success b { color: var(--petrol); }
+.leadership-panel { margin-top: 18px; }
+.leadership-panel .panel-heading { margin-bottom: 14px; }
 
 .admin-shell { min-height: 100vh; display: flex; background: var(--paper); }
 .admin-sidebar { width: 230px; flex: 0 0 230px; background: var(--petrol-dark); color: white; padding: 34px 20px 22px; display: flex; flex-direction: column; }
@@ -229,6 +243,9 @@ td small { color: #9aa2a3; font-size: 10px; }
   .form-submit { display: block; }
   .form-submit p { margin-bottom: 15px; }
   .form-submit .button { width: 100%; }
+  .leadership-intro h2 { font-size: 20px; }
+  .leadership-success { align-items: flex-start; }
+  .leadership-success .button { width: 100%; }
   .site-footer { margin-top: 28px; font-size: 10px; padding-inline: 10px; }
   .success-shell { padding: 16px; }
   .success-card { padding: 32px 22px; }

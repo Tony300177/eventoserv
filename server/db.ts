@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, like, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { auditLogs, eventSettings, InsertUser, registrations, Registration, users } from "../drizzle/schema.js";
+import { auditLogs, eventSettings, InsertUser, leadershipRegistrations, registrations, Registration, users } from "../drizzle/schema.js";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 export const EVENT_CAPACITY = 400;
@@ -25,6 +25,17 @@ async function ensureSchema(db: any) {
       await db.execute(sql`UPDATE "registrations" SET "employeeNameKey" = lower(regexp_replace(trim("employeeName"), '\\s+', ' ', 'g')) WHERE "employeeNameKey" IS NULL`);
       await db.execute(sql`ALTER TABLE "registrations" ALTER COLUMN "employeeNameKey" SET NOT NULL`);
       await db.execute(sql`CREATE UNIQUE INDEX IF NOT EXISTS "registrations_active_person_unique" ON "registrations" ("employeeNameKey") WHERE "status" = 'active'`);
+      await db.execute(sql`DO $$ BEGIN CREATE TYPE "status" AS ENUM ('active', 'cancelled'); EXCEPTION WHEN duplicate_object THEN null; END $$;`);
+      await db.execute(sql`CREATE TABLE IF NOT EXISTS "leadershipRegistrations" (
+        "id" serial PRIMARY KEY,
+        "protocol" varchar(24) NOT NULL UNIQUE,
+        "fullName" varchar(180) NOT NULL,
+        "fullNameKey" varchar(180) NOT NULL,
+        "sector" varchar(180) NOT NULL,
+        "status" "status" NOT NULL DEFAULT 'active',
+        "createdAt" timestamp NOT NULL DEFAULT now()
+      )`);
+      await db.execute(sql`CREATE UNIQUE INDEX IF NOT EXISTS "leadership_active_person_unique" ON "leadershipRegistrations" ("fullNameKey") WHERE "status" = 'active'`);
     })().catch((error) => {
       _schemaEnsured = null;
       throw error;
@@ -199,6 +210,46 @@ export async function createRegistration(input: {
   });
 }
 
+export async function createLeadershipRegistration(input: {
+  fullName: string;
+  sector: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("DATABASE_UNAVAILABLE");
+  const fullName = cleanText(input.fullName);
+  const sector = cleanText(input.sector);
+  const fullNameKey = normalizeName(input.fullName);
+
+  return await db.transaction(async (tx) => {
+    const [existing] = await tx
+      .select({ id: leadershipRegistrations.id })
+      .from(leadershipRegistrations)
+      .where(and(eq(leadershipRegistrations.fullNameKey, fullNameKey), eq(leadershipRegistrations.status, "active")))
+      .limit(1);
+    if (existing) throw new Error("DUPLICATE_LEADERSHIP");
+
+    const protocol = createProtocol();
+    const [inserted] = await tx.insert(leadershipRegistrations).values({
+      protocol,
+      fullName,
+      fullNameKey,
+      sector,
+      status: "active",
+    }).returning({ id: leadershipRegistrations.id });
+    return { id: Number(inserted.id), protocol, fullName, sector };
+  });
+}
+
+export async function listLeadershipRegistrations() {
+  const db = await getDb();
+  if (!db) throw new Error("DATABASE_UNAVAILABLE");
+  return db
+    .select()
+    .from(leadershipRegistrations)
+    .where(eq(leadershipRegistrations.status, "active"))
+    .orderBy(asc(leadershipRegistrations.sector), asc(leadershipRegistrations.fullName));
+}
+
 export async function listRegistrations(filters?: { search?: string; schoolSector?: string; status?: "all" | "active" | "cancelled"; eventDay?: "all" | EventDay }) {
   const db = await getDb();
   if (!db) throw new Error("DATABASE_UNAVAILABLE");
@@ -218,6 +269,7 @@ export async function getAdminStats() {
   if (!db) throw new Error("DATABASE_UNAVAILABLE");
   const stats = await getPublicStats();
   const rows = await db.select().from(registrations).orderBy(asc(registrations.schoolSector), asc(registrations.employeeName));
+  const [leadership] = await db.select({ count: sql<number>`count(*)` }).from(leadershipRegistrations).where(eq(leadershipRegistrations.status, "active"));
   const activeRows = rows.filter(row => row.status === "active");
   const distribution = Array.from(new Set(rows.map(row => row.schoolSector))).map(schoolSector => {
     const sectorRows = activeRows.filter(row => row.schoolSector === schoolSector);
@@ -231,6 +283,7 @@ export async function getAdminStats() {
     ...stats,
     employees: activeRows.length,
     cancelled: rows.filter(row => row.status === "cancelled").length,
+    leadership: Number(leadership?.count ?? 0),
     distribution,
   };
 }
@@ -320,6 +373,11 @@ export async function generateRegistrationReport() {
   const db = await getDb();
   if (!db) throw new Error("DATABASE_UNAVAILABLE");
   const rows = await db.select().from(registrations).orderBy(asc(registrations.eventDay), asc(registrations.schoolSector), asc(registrations.employeeName));
+  const leadershipRows = await db
+    .select()
+    .from(leadershipRegistrations)
+    .where(eq(leadershipRegistrations.status, "active"))
+    .orderBy(asc(leadershipRegistrations.sector), asc(leadershipRegistrations.fullName));
 
   const pdf = await import("pdfkit"); // @ts-ignore
   const doc = new pdf();
@@ -363,6 +421,17 @@ export async function generateRegistrationReport() {
         doc.ln(4);
       }
     }
+
+    doc.fontSize(13).text("Lideranças (dois dias)", { underline: true, bold: true });
+    doc.ln(4);
+    if (leadershipRows.length === 0) {
+      doc.fontSize(11).text("Nenhuma inscrição de liderança registrada.");
+    } else {
+      for (const row of leadershipRows) {
+        doc.fontSize(12).text(`• ${row.fullName} - ${row.protocol} - ${row.sector} - Dias 29 e 30`);
+      }
+    }
+    doc.ln(8);
 
     doc.fontSize(13).text("Por Escola/Setor", { underline: true, bold: true });
     doc.ln(4);

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
-import { cancelRegistration, createRegistration, generateRegistrationReport, getAdminStats, getPublicStats, listAuditLogs, listRegistrations, updateRegistration } from "./db.js";
+import { cancelRegistration, createLeadershipRegistration, createRegistration, generateRegistrationReport, getAdminStats, getPublicStats, listAuditLogs, listLeadershipRegistrations, listRegistrations, updateRegistration } from "./db.js";
 import type { TrpcContext } from "./context.js";
 
 const t = initTRPC.context<TrpcContext>().create({
@@ -50,6 +50,13 @@ export const appRouter = router({
   }),
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+  }),
+  leadership: router({
+    create: publicProcedure.input(z.object({
+      fullName: z.string().trim().min(3, "Informe o nome completo.").max(180),
+      sector: z.string().trim().min(2, "Informe o setor.").max(180),
+    })).mutation(({ input }) => createLeadershipRegistration(input)),
+    adminList: adminProcedure.query(() => listLeadershipRegistrations()),
   }),
   registration: router({
     publicStats: publicProcedure.query(() => getPublicStats()),

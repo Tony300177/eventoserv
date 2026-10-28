@@ -1,5 +1,5 @@
 import { FormEvent, useMemo, useState } from "react";
-import { Check, ChevronRight, CircleAlert, Clock, Info, LockKeyhole, MapPin } from "lucide-react";
+import { Check, ChevronRight, CircleAlert, Clock, Info, LockKeyhole, MapPin, UsersRound } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 const SCHOOLS = [
@@ -18,11 +18,23 @@ const rules = [
 type EventDay = "29" | "30";
 type FormState = { schoolSector: SchoolSector | ""; role: string; employeeName: string; eventDay: EventDay | "" };
 const initialForm: FormState = { schoolSector: "", role: "", employeeName: "", eventDay: "" };
+type LeadershipFormState = { fullName: string; sector: string };
+const initialLeadershipForm: LeadershipFormState = { fullName: "", sector: "" };
 
 export default function Home() {
   const [form, setForm] = useState<FormState>(initialForm);
   const [submitted, setSubmitted] = useState<{ protocol: string; eventDay: EventDay } | null>(null);
   const [error, setError] = useState("");
+  const [leadershipForm, setLeadershipForm] = useState<LeadershipFormState>(initialLeadershipForm);
+  const [leadershipSubmitted, setLeadershipSubmitted] = useState<{ protocol: string; fullName: string } | null>(null);
+  const [leadershipError, setLeadershipError] = useState("");
+  const createLeadership = trpc.leadership.create.useMutation({
+    onSuccess: data => { setLeadershipSubmitted(data); setLeadershipError(""); },
+    onError: err => {
+      if (err.message.includes("DUPLICATE_LEADERSHIP")) setLeadershipError("Já existe uma inscrição ativa com este nome.");
+      else setLeadershipError("Não foi possível concluir agora. Confira os campos e tente novamente.");
+    },
+  });
   const create = trpc.registration.create.useMutation({
     onSuccess: data => { setSubmitted(data); setError(""); },
     onError: err => {
@@ -33,13 +45,21 @@ export default function Home() {
     },
   });
   const canSubmit = useMemo(() => Boolean(form.schoolSector && form.role.trim() && form.employeeName.trim() && form.eventDay), [form]);
+  const canSubmitLeadership = useMemo(() => Boolean(leadershipForm.fullName.trim() && leadershipForm.sector.trim()), [leadershipForm]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) { setForm(current => ({ ...current, [key]: value })); }
+  function updateLeadership<K extends keyof LeadershipFormState>(key: K, value: LeadershipFormState[K]) { setLeadershipForm(current => ({ ...current, [key]: value })); }
   function submit(event: FormEvent) {
     event.preventDefault();
     setError("");
     if (!canSubmit) { setError("Preencha os campos obrigatórios e escolha o dia do evento."); return; }
     create.mutate({ ...form, schoolSector: form.schoolSector as SchoolSector, eventDay: form.eventDay as EventDay });
+  }
+  function submitLeadership(event: FormEvent) {
+    event.preventDefault();
+    setLeadershipError("");
+    if (!canSubmitLeadership) { setLeadershipError("Informe o nome completo e o setor."); return; }
+    createLeadership.mutate(leadershipForm);
   }
 
   if (submitted) {
@@ -68,6 +88,35 @@ export default function Home() {
         <div className="form-submit"><p><Info size={16} /> A inscrição só será confirmada após o envio.</p><button className="button button-primary" type="submit" disabled={create.isPending}>{create.isPending ? "Registrando..." : "Confirmar inscrição"}<ChevronRight size={17} /></button></div>
       </form>
       </div>
+      <section className="leadership-card" aria-labelledby="leadership-title">
+        <div className="leadership-intro">
+          <span className="leadership-badge"><UsersRound size={20} /></span>
+          <div>
+            <p className="eyebrow">Inscrição de lideranças</p>
+            <h2 id="leadership-title">Diretores, Assessores e Chefes de Departamento</h2>
+            <p>Confirme sua presença nos dois dias do evento, 29 e 30 de outubro. Informe apenas o nome completo e o setor.</p>
+          </div>
+        </div>
+        {leadershipSubmitted ? (
+          <div className="leadership-success" aria-live="polite">
+            <div className="success-mark"><Check size={22} strokeWidth={2.5} /></div>
+            <div>
+              <strong>Presença confirmada nos dois dias.</strong>
+              <p>{leadershipSubmitted.fullName}, seu protocolo é <b>{leadershipSubmitted.protocol}</b>.</p>
+            </div>
+            <button className="button button-outline" onClick={() => { setLeadershipForm(initialLeadershipForm); setLeadershipSubmitted(null); }}>Nova inscrição</button>
+          </div>
+        ) : (
+          <form className="registration-form" onSubmit={submitLeadership} noValidate>
+            <div className="field-grid">
+              <div className="field-group"><label htmlFor="leadershipName">Nome completo <span>*</span></label><input id="leadershipName" value={leadershipForm.fullName} onChange={e => updateLeadership("fullName", e.target.value)} placeholder="Seu nome completo" autoComplete="name" /></div>
+              <div className="field-group"><label htmlFor="leadershipSector">Setor <span>*</span></label><input id="leadershipSector" value={leadershipForm.sector} onChange={e => updateLeadership("sector", e.target.value)} placeholder="Ex.: Diretoria de Ensino" /></div>
+            </div>
+            {leadershipError && <div className="form-error" role="alert"><CircleAlert size={18} />{leadershipError}</div>}
+            <div className="form-submit"><p><Info size={16} /> Válido para os dias 29 e 30 de outubro.</p><button className="button button-primary" type="submit" disabled={createLeadership.isPending}>{createLeadership.isPending ? "Registrando..." : "Confirmar presença nos dois dias"}<ChevronRight size={17} /></button></div>
+          </form>
+        )}
+      </section>
       <footer className="site-footer">Desenvolvido pelo Departamento de Tecnologia da SME.</footer>
     </section>
   </main>;
